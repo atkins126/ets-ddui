@@ -25,10 +25,10 @@ DDUI库理论上与Delphi的VCL库完全兼容，可独立使用。
 * **操作系统**
   Windows 7及以上版本的操作系统。
 * **Delphi2007**
-  本库在Delphi2007中开发完成，因为用到运算符重载的语法，因此，Delphi7目前是不支持的。
+  本库在Delphi2007中开发完成，因为用到运算符重载的语法，因此，Delphi7是不支持的。
   针对Delphi XE系列，因为一些公共的单元文件CodeGear做得不兼容，所以，理论上也不支持。
 * **.Net 2.0**
-  在安装Delphi2007时，理论上会自动安装，在构成程序时，会使用到`MsBuild.exe`。
+  在安装Delphi2007时，理论上会自动安装，在构建程序时，会使用到`MsBuild.exe`。
 
 ## 编译
 
@@ -46,15 +46,15 @@ DDUI库理论上与Delphi的VCL库完全兼容，可独立使用。
    【Environment Options->Delphi Options->Library - Win32】，设置bpl的生成目录
    * **Package output directory**: 设置为`$(BinDir)\Component`
    * **DCP output directory**: 设置为`$(BinDir)\Component`
-3. 打开工程"Delphi\DDUI\dclDDUI.dpk"，执行菜单【Project->Build all projects】编译程序
+2. 打开工程"Delphi\DDUI\dclDDUI.dpk"，执行菜单【Project->Build all projects】编译程序
 
-若一切正常，则会在"BinDir"所指向的目录中生成编译结果。
+若一切正常，则会在"BinDir"所指向的目录中生成最终文件。
 
 > Delphi默认维护的工程文件有很多冗余信息，所以，我将冗余的内容移到了"ETS.props"、"ETS.End.props"中进行管理。
 >
-> 但Delphi IDE无法正确识别这些自定义的内容，从而造成了在IDE的工程配置菜单中，无法正确对设置工程参数的问题。
+> 但Delphi IDE无法正确识别这些自定义的内容，从而造成在IDE工程配置菜单中，无法正确显示相关参数。
 >
-> 另一方面，如果在IDE中重新保存了工程文件，会将自定义内容覆盖掉，有可能导致编译出现问题。
+> 另一方面，如果在IDE中修改了工程文件配置，会覆盖掉自定义内容，有可能导致编译出错。
 
 ### 命令行编译
 
@@ -75,4 +75,4 @@ DDUI库理论上与Delphi的VCL库完全兼容，可独立使用。
 # 相关链接
 
 作者邮箱: xinghun87@163.com
-官方博客：[https://blog.csdn.net/xinghun61](https://blog.csdn.net/xinghun61)
+作者博客：[https://blog.csdn.net/xinghun61](https://blog.csdn.net/xinghun61)
