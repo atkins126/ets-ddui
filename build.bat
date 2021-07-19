@@ -4,5 +4,7 @@ set BinDir=%~dp0Out
 
 MSBuild.exe Delphi\DDUI\dclDDUI.dproj
 MSBuild.exe Delphi\DDUI\DDUI.dproj
+::MSBuild.exe Delphi\ThirdParty\JCL\JCL.dproj
+MSBuild.exe Delphi\Demo\ทย360\Fake360.dproj
 
 pause
