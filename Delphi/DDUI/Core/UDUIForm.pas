@@ -867,12 +867,18 @@ begin
   end;
 
   if Assigned(FDUIActiveControl) then
+  begin
+    FDUIActiveControl.RemoveFreeNotification(Self);
     FDUIActiveControl.Perform(WM_KILLFOCUS, 0, 0);
+  end;
 
   FDUIActiveControl := ADUIControl;
 
   if Assigned(FDUIActiveControl) then
+  begin
+    FDUIActiveControl.FreeNotification(Self);
     FDUIActiveControl.Perform(WM_SETFOCUS, 0, 0);
+  end;
 
   Result := True;
 end;
@@ -1289,6 +1295,15 @@ var
   i: Integer;
 begin
   inherited;
+
+  {$IFDEF DESIGNTIME}
+  {$ELSE}
+  if (FDUIActiveControl = AComponent) and (AOperation = opRemove) then
+  begin
+    FDUIActiveControl := nil;
+    Exit;
+  end;
+  {$ENDIF}
 
   if Assigned(FTimer) and (AOperation = opRemove) then
   begin

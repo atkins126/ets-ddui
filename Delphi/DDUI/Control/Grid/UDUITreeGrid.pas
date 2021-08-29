@@ -1471,6 +1471,7 @@ begin
   begin
     ArcBorder := False;
     WinControl.Visible := True;
+    Text := GetEditText(Col, Row);
   end;
 end;
 

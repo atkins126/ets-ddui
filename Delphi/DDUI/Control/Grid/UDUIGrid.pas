@@ -696,7 +696,8 @@ begin
           if ssCtrl in KeyDataToShiftState(TWMKeyDown(AMessage).KeyData) then
             Perform(AMessage.Msg, AMessage.WParam, AMessage.LParam);
       else
-        FOldEditWndProc(AMessage);
+        if Assigned(FEditor) then
+          FOldEditWndProc(AMessage);
       end;
 
       Exit;
@@ -727,7 +728,8 @@ begin
     end;
   end;
 
-  FOldEditWndProc(AMessage);
+  if Assigned(FEditor) then
+    FOldEditWndProc(AMessage);
 end;
 
 procedure TDUIGridBase.KeyDown(var AKey: Word; AShift: TShiftState);
