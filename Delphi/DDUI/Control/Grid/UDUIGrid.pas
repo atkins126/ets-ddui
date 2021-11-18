@@ -353,6 +353,7 @@ begin
   FStringFormat := TGPStringFormat.Create;
   FStringFormat.SetAlignment(StringAlignmentNear);
   FStringFormat.SetLineAlignment(StringAlignmentCenter);
+  FStringFormat.SetFormatFlags(StringFormatFlagsNoWrap);
 
   //滚动条是反着创建的
   FScrollBars[rctCol] := TDUIScrollBar.Create(Self); //行滚动条

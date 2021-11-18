@@ -69,6 +69,7 @@ type
     destructor Destroy; override;
   end;
 
+  TDUITreeNodeClass = class of TDUITreeNode;
   TDUITreeNode = class
   private
     //叶子节点、节点链表的尾节点都会存在一些空指针，重复利用这些指针存在一些特殊信息：
@@ -77,6 +78,7 @@ type
     FPrior, FNext, FFirst, FLast: TDUITreeNode;
     FCaption: String;
     FIndex: Integer;
+    FNodeClass: TDUITreeNodeClass;
     function GetIndex: Integer;
     function GetLevel: Integer;
     function GetParent: TDUITreeNode;
@@ -101,6 +103,7 @@ type
     function GetData(AAutoCreate: Boolean = False): TDUITreeData;
   public
     procedure BeforeDestruction; override;
+    constructor Create(ANodeClass: TDUITreeNodeClass);
     destructor Destroy; override;
     function AddChild(ACaption: String; AFirst: Boolean = False): TDUITreeNode;
     procedure Clear;
@@ -323,6 +326,11 @@ end;
 
 { TDUITreeNode }
 
+constructor TDUITreeNode.Create(ANodeClass: TDUITreeNodeClass);
+begin
+  FNodeClass := ANodeClass;
+end;
+
 destructor TDUITreeNode.Destroy;
 begin
   GetData.Free;
@@ -332,7 +340,7 @@ end;
 
 function TDUITreeNode.AddChild(ACaption: String; AFirst: Boolean): TDUITreeNode;
 begin
-  Result := TDUITreeNode.Create;
+  Result := FNodeClass.Create(FNodeClass);
   Result.FCaption := ACaption;
   Result.FLast := Self;
 
@@ -832,7 +840,7 @@ begin
   FColumns := TDUITreeColumns.Create(Self);
   FColumns.Add('');
 
-  FRootNode := TDUITreeNode.Create;
+  FRootNode := TDUITreeNode.Create(TDUITreeNode);
   FRootNode.FLast := TDUITreeNode(Self);
 end;
 
