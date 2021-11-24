@@ -53,7 +53,7 @@ type
     procedure Notify(AItem: TCollectionItem; AAction: TCollectionNotification); override;
     procedure Update(AItem: TCollectionItem); override;
   public
-    constructor Create(AParent: TDUITreeGrid);
+    constructor Create(AParent: TDUITreeGrid; AItemClass: TCollectionItemClass);
     function Add(ACaption: String): TDUITreeColumn;
     property Items[AIndex: Integer]: TDUITreeColumn read GetColumn write SetColumn; default;
   end;
@@ -147,6 +147,7 @@ type
     function GetCells(ACol: TDUITreeColumn; ARow: TDUITreeNode): String;
     procedure SetCells(ACol: TDUITreeColumn; ARow: TDUITreeNode; const AValue: String);
   protected
+    procedure DoCreate(var AColumns: TDUITreeColumns; var ARootNode: TDUITreeNode); virtual;
     function CalcMovedID(const AIndex: TDUIRowColID;
       ACount: Integer; AMoveModes: TDUIMoveModes): TDUIRowColID; override;
     function DoCompare(const ALeft, ARight: TDUIRowColID): Integer; override;
@@ -250,9 +251,9 @@ begin
   Result.Caption := ACaption;
 end;
 
-constructor TDUITreeColumns.Create(AParent: TDUITreeGrid);
+constructor TDUITreeColumns.Create(AParent: TDUITreeGrid; AItemClass: TCollectionItemClass);
 begin
-  inherited Create(TDUITreeColumn);
+  inherited Create(AItemClass);
 
   FParent := AParent;
 end;
@@ -837,10 +838,7 @@ constructor TDUITreeGrid.Create(AOwner: TComponent);
 begin
   inherited;
 
-  FColumns := TDUITreeColumns.Create(Self);
-  FColumns.Add('');
-
-  FRootNode := TDUITreeNode.Create(TDUITreeNode);
+  DoCreate(FColumns, FRootNode);
   FRootNode.FLast := TDUITreeNode(Self);
 end;
 
@@ -861,6 +859,14 @@ begin
   end;
 
   inherited;
+end;
+
+procedure TDUITreeGrid.DoCreate(var AColumns: TDUITreeColumns; var ARootNode: TDUITreeNode);
+begin
+  AColumns := TDUITreeColumns.Create(Self, TDUITreeColumn);
+  AColumns.Add('');
+
+  ARootNode := TDUITreeNode.Create(TDUITreeNode);
 end;
 
 function TDUITreeGrid.CalcDiagonalNode(ANode: TDUIRowColID; ADistinct: PInteger): TDUIRowColID;
