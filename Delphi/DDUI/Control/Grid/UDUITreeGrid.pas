@@ -53,7 +53,7 @@ type
     procedure Notify(AItem: TCollectionItem; AAction: TCollectionNotification); override;
     procedure Update(AItem: TCollectionItem); override;
   public
-    constructor Create(AParent: TDUITreeGrid);
+    constructor Create(AParent: TDUITreeGrid; AItemClass: TCollectionItemClass);
     function Add(ACaption: String): TDUITreeColumn;
     property Items[AIndex: Integer]: TDUITreeColumn read GetColumn write SetColumn; default;
   end;
@@ -69,6 +69,7 @@ type
     destructor Destroy; override;
   end;
 
+  TDUITreeNodeClass = class of TDUITreeNode;
   TDUITreeNode = class
   private
     //叶子节点、节点链表的尾节点都会存在一些空指针，重复利用这些指针存在一些特殊信息：
@@ -77,6 +78,7 @@ type
     FPrior, FNext, FFirst, FLast: TDUITreeNode;
     FCaption: String;
     FIndex: Integer;
+    FNodeClass: TDUITreeNodeClass;
     function GetIndex: Integer;
     function GetLevel: Integer;
     function GetParent: TDUITreeNode;
@@ -101,6 +103,7 @@ type
     function GetData(AAutoCreate: Boolean = False): TDUITreeData;
   public
     procedure BeforeDestruction; override;
+    constructor Create(ANodeClass: TDUITreeNodeClass);
     destructor Destroy; override;
     function AddChild(ACaption: String; AFirst: Boolean = False): TDUITreeNode;
     procedure Clear;
@@ -144,6 +147,7 @@ type
     function GetCells(ACol: TDUITreeColumn; ARow: TDUITreeNode): String;
     procedure SetCells(ACol: TDUITreeColumn; ARow: TDUITreeNode; const AValue: String);
   protected
+    procedure DoCreate(var AColumns: TDUITreeColumns; var ARootNode: TDUITreeNode); virtual;
     function CalcMovedID(const AIndex: TDUIRowColID;
       ACount: Integer; AMoveModes: TDUIMoveModes): TDUIRowColID; override;
     function DoCompare(const ALeft, ARight: TDUIRowColID): Integer; override;
@@ -247,9 +251,9 @@ begin
   Result.Caption := ACaption;
 end;
 
-constructor TDUITreeColumns.Create(AParent: TDUITreeGrid);
+constructor TDUITreeColumns.Create(AParent: TDUITreeGrid; AItemClass: TCollectionItemClass);
 begin
-  inherited Create(TDUITreeColumn);
+  inherited Create(AItemClass);
 
   FParent := AParent;
 end;
@@ -323,6 +327,11 @@ end;
 
 { TDUITreeNode }
 
+constructor TDUITreeNode.Create(ANodeClass: TDUITreeNodeClass);
+begin
+  FNodeClass := ANodeClass;
+end;
+
 destructor TDUITreeNode.Destroy;
 begin
   GetData.Free;
@@ -332,7 +341,7 @@ end;
 
 function TDUITreeNode.AddChild(ACaption: String; AFirst: Boolean): TDUITreeNode;
 begin
-  Result := TDUITreeNode.Create;
+  Result := FNodeClass.Create(FNodeClass);
   Result.FCaption := ACaption;
   Result.FLast := Self;
 
@@ -829,10 +838,7 @@ constructor TDUITreeGrid.Create(AOwner: TComponent);
 begin
   inherited;
 
-  FColumns := TDUITreeColumns.Create(Self);
-  FColumns.Add('');
-
-  FRootNode := TDUITreeNode.Create;
+  DoCreate(FColumns, FRootNode);
   FRootNode.FLast := TDUITreeNode(Self);
 end;
 
@@ -853,6 +859,14 @@ begin
   end;
 
   inherited;
+end;
+
+procedure TDUITreeGrid.DoCreate(var AColumns: TDUITreeColumns; var ARootNode: TDUITreeNode);
+begin
+  AColumns := TDUITreeColumns.Create(Self, TDUITreeColumn);
+  AColumns.Add('');
+
+  ARootNode := TDUITreeNode.Create(TDUITreeNode);
 end;
 
 function TDUITreeGrid.CalcDiagonalNode(ANode: TDUIRowColID; ADistinct: PInteger): TDUIRowColID;
@@ -1471,6 +1485,7 @@ begin
   begin
     ArcBorder := False;
     WinControl.Visible := True;
+    Text := GetEditText(Col, Row);
   end;
 end;
 

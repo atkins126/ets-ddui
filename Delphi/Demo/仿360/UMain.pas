@@ -17,7 +17,7 @@ unit UMain;
 interface
 
 uses
-  Windows, UDUIForm, Classes, Controls, UDUICore, UDUIButton, UDUIPanel;
+  Windows, SysUtils, UDUIForm, Classes, Controls, UDUICore, UDUIButton, UDUIPanel;
 
 type
   TFmMain = class(TDUIForm)
@@ -40,7 +40,8 @@ var
 implementation
 
 uses
-  Messages, UDUISkin, UWelcome, UNormal, UGrid, UWinControl, UAbout;
+  Messages, UTool, JclDebug, JclHookExcept,
+  UDUISkin, UWelcome, UNormal, UGrid, UWinControl, UAbout;
 
 {$R *.dfm}
 
@@ -86,5 +87,30 @@ begin
   SbWelcome.Perform(WM_LBUTTONDOWN, 0, MakeLParam(0, 0));
   SbWelcome.Perform(WM_LBUTTONUP, 0, MakeLParam(0, 0));
 end;
+
+procedure DoJclException(AExceptObj: TObject; AExceptAddr: Pointer; AOSException: Boolean);
+var
+  slst: TStringList;
+  str: String;
+begin
+  slst := TStringList.Create;
+  try
+    JclLastExceptStackListToStrings(slst, True);
+    if AExceptObj is Exception then
+      str := Format('错误信息：'#$D#$A'(%s)%s'#$D#$A'调用栈：'#$D#$A'%s',
+        [AExceptObj.ClassName, Exception(AExceptObj).Message, slst.Text])
+    else
+      str := Format('错误信息：'#$D#$A'%s'#$D#$A'调用栈：'#$D#$A'%s',
+        [AExceptObj.ClassName, slst.Text]);
+  finally
+    FreeAndNil(slst);
+  end;
+
+  WriteView(str);
+end;
+
+initialization
+  JclStartExceptionTracking;
+  JclAddExceptNotifier(DoJclException);
 
 end.

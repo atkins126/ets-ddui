@@ -562,8 +562,11 @@ begin
       Exit;
 
     for i := 0 to nd.Count - 1 do
+    begin
+      objChild := nil;
       if not JsonToComponent(objChild, nd[i], AObject) then
         Exit;
+    end;
   end;
 
   Result := True;

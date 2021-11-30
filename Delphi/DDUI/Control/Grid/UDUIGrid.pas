@@ -353,6 +353,7 @@ begin
   FStringFormat := TGPStringFormat.Create;
   FStringFormat.SetAlignment(StringAlignmentNear);
   FStringFormat.SetLineAlignment(StringAlignmentCenter);
+  FStringFormat.SetFormatFlags(StringFormatFlagsNoWrap);
 
   //滚动条是反着创建的
   FScrollBars[rctCol] := TDUIScrollBar.Create(Self); //行滚动条
@@ -696,7 +697,8 @@ begin
           if ssCtrl in KeyDataToShiftState(TWMKeyDown(AMessage).KeyData) then
             Perform(AMessage.Msg, AMessage.WParam, AMessage.LParam);
       else
-        FOldEditWndProc(AMessage);
+        if Assigned(FEditor) then
+          FOldEditWndProc(AMessage);
       end;
 
       Exit;
@@ -727,7 +729,8 @@ begin
     end;
   end;
 
-  FOldEditWndProc(AMessage);
+  if Assigned(FEditor) then
+    FOldEditWndProc(AMessage);
 end;
 
 procedure TDUIGridBase.KeyDown(var AKey: Word; AShift: TShiftState);

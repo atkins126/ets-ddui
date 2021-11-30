@@ -148,7 +148,8 @@ begin
     end;
   end;
 
-  FOldWinControlWndProc(AMessage);
+  if Assigned(FWinControl) then
+    FOldWinControlWndProc(AMessage);
 end;
 
 procedure TDUIWinBase.WndProc(var AMessage: TMessage);
@@ -158,29 +159,39 @@ begin
   case AMessage.Msg of
     WM_GETDLGCODE:
     begin
-      FOldWinControlWndProc(AMessage);
+      if Assigned(FWinControl) then
+        FOldWinControlWndProc(AMessage);
+
       Exit;
     end;
     WM_KEYFIRST..WM_KEYLAST:
     begin
-      FOldWinControlWndProc(AMessage);
+      if Assigned(FWinControl) then
+        FOldWinControlWndProc(AMessage);
+
       Exit;
     end;
     WM_SETFOCUS:
     begin
-      if FAutoHide then
-        FWinControl.Visible := True;
+      if Assigned(FWinControl) then
+      begin
+        if FAutoHide then
+          FWinControl.Visible := True;
 
-      if not FWinControl.Focused and FWinControl.CanFocus
-        and not FWinControl.ContainsControl(FindControl(GetFocus)) then
-        FWinControl.SetFocus;
+        if not FWinControl.Focused and FWinControl.CanFocus
+          and not FWinControl.ContainsControl(FindControl(GetFocus)) then
+          FWinControl.SetFocus;
+      end;
 
       Exit;
     end;
     WM_KILLFOCUS:
     begin
-      if FAutoHide then
-        FWinControl.Visible := False;
+      if Assigned(FWinControl) then
+      begin
+        if FAutoHide then
+          FWinControl.Visible := False;
+      end;
     end;
     WM_WINDOWPOSCHANGED:
     begin
@@ -205,7 +216,8 @@ procedure TDUIWinBase.CMEnabledChanged(var AMessage: TMessage);
 begin
   inherited;
 
-  FWinControl.Enabled := Enabled;
+  if Assigned(FWinControl) then
+    FWinControl.Enabled := Enabled;
 end;
 
 procedure TDUIWinBase.CMVisibleChanged(var AMessage: TMessage);
@@ -213,6 +225,9 @@ var
   ctl: TDUIBase;
 begin
   inherited;
+
+  if not Assigned(FWinControl) then
+    Exit;
 
   ctl := Self;
   while Assigned(ctl) do
@@ -235,6 +250,9 @@ var
   ctl: TDUIBase;
 begin
   inherited;
+
+  if not Assigned(FWinControl) then
+    Exit;
 
   ctl := Self;
   while Assigned(ctl.DUIParent) do
